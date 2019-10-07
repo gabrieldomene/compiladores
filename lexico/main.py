@@ -89,8 +89,6 @@ for idx, line in enumerate(file_name):
             print('[ERRO] {} desconhecido na linha {}' .format(element, idx+1))
             flagError = 1
 
-
-print(output)
 if strFlagLine:
     print('[ERRO] string não fechada na linha {}' .format(strFlagLine))
     flagError = 1
@@ -101,6 +99,6 @@ if commentFlag:
     flagError = 1
 
 if not flagError:
-    output_file = open('out.txt', 'w')
+    output_file = open('out.lex', 'w')
     output_file.write(output)
     output_file.close()
