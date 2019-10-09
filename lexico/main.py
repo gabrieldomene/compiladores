@@ -5,7 +5,7 @@ file_name = open(sys.argv[1], 'r')
 reservedWords = {'write' : 0, 'while' : 1, 'until' : 2, 'to' : 3, 'then' : 4, 'string' : 5, 'repeat' : 6, 'real' : 7, 'read' : 8, 'program' : 9, 'procedure' : 10, 'or' : 11, 'of' : 12, 'literal' : 13, 'integer' : 14, 'if' : 15, 'for' : 18, 'end' : 19, 'else' : 20, 'do' : 21,'declaravariaveis': 22, 'const' : 23, 'char' : 24, 'chamaprocedure' : 25, 'begin' : 26, 'array' : 27, 'end' : 28}
 
 
-dictRegex = {'reservada|identificador':'^[A-Za-z]\w+$', 'stringInicio':'^\"', 'stringFim':'.*\"$', 'stringTotal':'^\".*\"$', 'char' : '^\'.\'$', 'numReal' : '^\d+\.\d+$', 'numInteiro' : '^\d+$', '>=' : '^\>\=$', '>': '^\>$', '=' : '^\=$', '<>' : '^\<\>$', '<=' : '^\<\=$', '<' : '^\<$', '+' : '^\+$', ']' : '^\]$', '[' : '^\[$', ';' : '^;$', ':' : '^:$', '/' : '^\/$', '..' : '^\.\.$', '.' : '^\.$', ',' : '^,$', '*' : '^\*$', ')' : '^\)$', '(' : '^\($', '-' : '^-$', 'lineComment' : '^\/\/.*$', 'beginComment' : '^\/\*', 'endComment' : '\*\/$', 'blockComment' : '^\/\*.*\*\/$'}
+dictRegex = {'reservada|identificador':'^[A-Za-z]\w+$', 'stringInicio':'^\"', 'stringFim':'.*\"$', 'stringTotal':'^\".*\"$', 'char' : '^\'.\'$', 'numReal' : '^-?\d+\.\d+$', 'numInteiro' : '^-?\d+$', '>=' : '^\>\=$', '>': '^\>$', '=' : '^\=$', '<>' : '^\<\>$', '<=' : '^\<\=$', '<' : '^\<$', '+' : '^\+$', ']' : '^\]$', '[' : '^\[$', ';' : '^;$', ':' : '^:$', '/' : '^\/$', '..' : '^\.\.$', '.' : '^\.$', ',' : '^,$', '*' : '^\*$', ')' : '^\)$', '(' : '^\($', '-' : '^-$', 'lineComment' : '^\/\/.*$', 'beginComment' : '^\/\*', 'endComment' : '\*\/$', 'blockComment' : '^\/\*.*\*\/$'}
 output = ''
 strFlag = 0
 strFlagLine = None
@@ -43,11 +43,19 @@ for idx, line in enumerate(file_name):
             print('<nomechar, 39> identificado na linha {}' .format(idx+1))
             output += '39 '
         elif re.match(dictRegex['numReal'], element):
-            print('<numreal, 36> identificado na linha {}' .format(idx+1))
-            output += '36 '
+            element = float(element)
+            if element <= 3.456789e+7 and element >= -3.456789e+7:
+                print('<numreal, 36> identificado na linha {}' .format(idx+1))
+                output += '36 '
+            else:
+                print('[ERRO] <{}> limite float na linha {}' .format(element, idx+1))
         elif re.match(dictRegex['numInteiro'], element):
-            print('<numinteiro, 37> identificado na linha {}' .format(idx+1))
-            output += '37 '
+            element = int(element)
+            if element <= 2097152 and element >= -2097152:
+                print('<numinteiro, 37> identificado na linha {}' .format(idx+1))
+                output += '37 '
+            else:
+                print('[ERRO] <{}> limite integer na linha {}' .format(element, idx+1))
         elif re.match(dictRegex['>='], element):
             print('<{}, 29> identificado na linha {}' .format(element, idx+1))
             output += '29 '
