@@ -5,10 +5,12 @@ file_name = open(sys.argv[1], 'r')
 reservedWords = {'write' : 0, 'while' : 1, 'until' : 2, 'to' : 3, 'then' : 4, 'string' : 5, 'repeat' : 6, 'real' : 7, 'read' : 8, 'program' : 9, 'procedure' : 10, 'or' : 11, 'of' : 12, 'literal' : 13, 'integer' : 14, 'if' : 15, 'for' : 18, 'end' : 19, 'else' : 20, 'do' : 21,'declaravariaveis': 22, 'const' : 23, 'char' : 24, 'chamaprocedure' : 25, 'begin' : 26, 'array' : 27, 'end' : 28}
 
 
-dictRegex = {'reservada|identificador':'^[A-Za-z]\w+$', 'stringInicio':'^\"', 'stringFim':'.*\"$', 'stringTotal':'^\".*\"$', 'char' : '^\'.\'$', 'numReal' : '^-?\d+\.\d+$', 'numInteiro' : '^-?\d+$', '>=' : '^\>\=$', '>': '^\>$', '=' : '^\=$', '<>' : '^\<\>$', '<=' : '^\<\=$', '<' : '^\<$', '+' : '^\+$', ']' : '^\]$', '[' : '^\[$', ';' : '^;$', ':' : '^:$', '/' : '^\/$', '..' : '^\.\.$', '.' : '^\.$', ',' : '^,$', '*' : '^\*$', ')' : '^\)$', '(' : '^\($', '-' : '^-$', 'lineComment' : '^\/\/.*$', 'beginComment' : '^\/\*', 'endComment' : '\*\/$', 'blockComment' : '^\/\*.*\*\/$'}
+dictRegex = {'reservada|identificador':'^[A-Za-z]\w+$', 'literalInicio':'^\`', 'literalFim':'.*\`$', 'literalTotal':'^\`.*\`$', 'stringInicio':'^\"', 'stringFim':'.*\"$', 'stringTotal':'^\".*\"$', 'char' : '^\'.\'$', 'numReal' : '^-?\d+\.\d+$', 'numInteiro' : '^-?\d+$', '>=' : '^\>\=$', '>': '^\>$', '=' : '^\=$', '<>' : '^\<\>$', '<=' : '^\<\=$', '<' : '^\<$', '+' : '^\+$', ']' : '^\]$', '[' : '^\[$', ';' : '^;$', ':' : '^:$', '/' : '^\/$', '..' : '^\.\.$', '.' : '^\.$', ',' : '^,$', '*' : '^\*$', ')' : '^\)$', '(' : '^\($', '-' : '^-$', 'lineComment' : '^\/\/.*$', 'beginComment' : '^\/\*', 'endComment' : '\*\/$', 'blockComment' : '^\/\*.*\*\/$'}
 output = ''
 strFlag = 0
 strFlagLine = None
+litFlag = 0
+litFlagLine = None
 commentFlag = 0
 flagError = 0
 for idx, line in enumerate(file_name):
@@ -26,6 +28,12 @@ for idx, line in enumerate(file_name):
                 strFlag = 0
                 strFlagLine = None
                 output += '38 '
+        elif litFlag:
+            if re.match(dictRegex['literalFim'], element):
+                print('<literal, 13> identificado na linha {}' .format(litFlagLine))
+                litFlag = 0
+                litFlagLine = None
+                output += '13 '
         elif re.match(dictRegex['reservada|identificador'], element):
             if element in reserverdWords.keys():
                 print('<{}, {}> identificado na linha {}' .format(element, reservedWords[element], idx+1))
@@ -39,6 +47,12 @@ for idx, line in enumerate(file_name):
         elif re.match(dictRegex['stringInicio'], element):
             strFlag = 1
             strFlagLine = idx+1
+        elif re.match(dictRegex['literalTotal'], element):
+            print('<literal, 13> identificado na linha {}' .format(idx+1))
+            output += '13 '
+        elif re.match(dictRegex['literalInicio'], element):
+            litFlag = 1
+            litFlagLine = idx+1
         elif re.match(dictRegex['char'], element):
             print('<nomechar, 39> identificado na linha {}' .format(idx+1))
             output += '39 '
@@ -123,11 +137,16 @@ for idx, line in enumerate(file_name):
             print('[ERRO] <{}> desconhecido na linha {}' .format(element, idx+1))
             flagError = 1
 
+file_name.close()
+
 if strFlagLine:
     print('[ERRO] string não fechada na linha {}' .format(strFlagLine))
     flagError = 1
-file_name.close()
 
+if litFlagLine:
+    print('[ERRO] literal não fechado na linha {}' .format(litFlagLine))
+    flagError = 1
+    
 if commentFlag:
     print('[ERRO] comentário de bloco não fechado')
     flagError = 1
