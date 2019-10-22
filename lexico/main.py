@@ -35,7 +35,7 @@ for idx, line in enumerate(file_name):
                 litFlagLine = None
                 output += '13 '
         elif re.match(dictRegex['reservada|identificador'], element):
-            if element in reserverdWords.keys():
+            if element in reservedWords.keys():
                 print('<{}, {}> identificado na linha {}' .format(element, reservedWords[element], idx+1))
                 output += str(reservedWords[element]) + ' ' #Token dict palavra reservada
             else:
